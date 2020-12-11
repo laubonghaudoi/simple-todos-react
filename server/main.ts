@@ -1,4 +1,5 @@
 import { Meteor } from "meteor/meteor";
+import { Accounts } from "meteor/accounts-base";
 import { TasksCollection } from "/imports/api/TasksCollection";
 import { LinksCollection } from "/imports/api/links";
 
@@ -6,22 +7,16 @@ function insertLink(title: string, url: string) {
   LinksCollection.insert({ title, url, createdAt: new Date() });
 }
 
-const insertTask = (taskText: string, createdAt: Date) =>
-  TasksCollection.insert({ text: taskText, createdAt, isChecked: false });
+const insertTask = (taskText: string, user: Meteor.User | undefined | null) =>
+  TasksCollection.insert({
+    text: taskText,
+    userId: user?._id || "",
+    createdAt: new Date(),
+    isChecked: true,
+  });
 
-Meteor.startup(() => {
-  // if (TasksCollection.find().count() === 0) {
-  //   [
-  //     "First Task",
-  //     "Second Task",
-  //     "Third Task",
-  //     "Fourth Task",
-  //     "Fifth Task",
-  //     "Sixth Task",
-  //     "Seventh Task",
-  //   ].forEach(insertTask);
-  // }
-});
+const SEED_USERNAME = "foo";
+const SEED_PASSWORD = "bar";
 
 Meteor.startup(() => {
   // If the Links collection is empty, add some data.
@@ -36,5 +31,16 @@ Meteor.startup(() => {
     insertLink("Read the Docs", "https://docs.meteor.com");
 
     insertLink("Discussions", "https://forums.meteor.com");
+  }
+
+  if (!Accounts.findUserByUsername(SEED_USERNAME)) {
+    Accounts.createUser({
+      username: SEED_USERNAME,
+      password: SEED_PASSWORD,
+    });
+  }
+  const user = Accounts.findUserByUsername(SEED_USERNAME);
+  if (TasksCollection.find().count() === 0) {
+    insertTask("Foobar", user);
   }
 });
