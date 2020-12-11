@@ -1,7 +1,7 @@
 import { Mongo } from "meteor/mongo";
 
 export interface TaskInterface {
-  _id: number;
+  _id: string;
   text: string;
   createdAt: Date;
   isChecked: boolean;
