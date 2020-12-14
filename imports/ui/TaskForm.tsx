@@ -1,10 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import React, { useState } from "react";
-interface Props {
-  userId: string;
-}
 
-export const TaskForm = (props: Props) => {
+export const TaskForm = () => {
   const [text, setText] = useState<string>("");
 
   const handleSubmit = (e: any) => {

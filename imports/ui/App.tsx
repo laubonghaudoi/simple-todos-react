@@ -15,32 +15,41 @@ export const App = () => {
   const userFilter = user ? { userId: user._id } : {};
   const pendingOnlyFilter = { ...hideCompletedFilter, ...userFilter };
 
-  const pendingTasksCount = useTracker(() => {
-    if (!user) {
-      return 0;
+  const { tasks, pendingTasksCount, isLoading } = useTracker(() => {
+    if (!Meteor.user()) {
+      return {
+        tasks: [],
+        pendingTasksCount: 0,
+        isLoading: false,
+      };
     }
-    const pendingOnlyFilter = { ...hideCompletedFilter, ...userFilter };
-    return TasksCollection.find(pendingOnlyFilter).count();
-  });
-  const pendingTasksTitle = `${
-    pendingTasksCount ? ` (${pendingTasksCount})` : ""
-  }`;
+    const handler = Meteor.subscribe("tasks");
 
-  const tasks = useTracker(() => {
-    if (!user) {
-      return [];
+    if (!handler.ready()) {
+      return {
+        tasks: [],
+        pendingTasksCount: 0,
+        isLoading: true,
+      };
     }
 
-    return TasksCollection.find(
+    const tasks = TasksCollection.find(
       hideCompleted ? pendingOnlyFilter : userFilter,
       {
         sort: { createdAt: -1 },
       }
     ).fetch();
+    const pendingTasksCount = TasksCollection.find(pendingOnlyFilter).count();
+
+    return { tasks, pendingTasksCount, isLoading: false };
   });
 
+  const pendingTasksTitle = `${
+    pendingTasksCount ? ` (${pendingTasksCount})` : ""
+  }`;
+
   const logout = () => Meteor.logout();
-  
+
   return (
     <div className="app">
       <header>
@@ -56,12 +65,13 @@ export const App = () => {
             <div className="user" onClick={logout}>
               {user.username} 🚪
             </div>
-            <TaskForm userId={user._id} />
+            <TaskForm />
             <div className="filter">
               <button onClick={() => setHideCompleted(!hideCompleted)}>
                 {hideCompleted ? "Show All" : "Hide Completed"}
               </button>
             </div>
+            {isLoading && <div className="loading">loading...</div>}
             <ul className="tasks">
               {tasks.map((task: TaskInterface) => (
                 <Task task={task} />
