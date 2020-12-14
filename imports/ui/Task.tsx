@@ -1,16 +1,13 @@
+import { Meteor } from "meteor/meteor";
 import React from "react";
-import { TaskInterface, TasksCollection } from "/imports/api/TasksCollection";
+import { TaskInterface } from "../db/TasksCollection";
 
 const toggleChecked = (task: TaskInterface) => {
-  TasksCollection.update(task._id, {
-    $set: {
-      isChecked: !task.isChecked,
-    },
-  });
+  Meteor.call("tasks.setIsChecked", task._id, !task.isChecked);
 };
 
-const deleteTask = (task: TaskInterface) => TasksCollection.remove(task._id);
-
+const deleteTask = (task: TaskInterface) =>
+  Meteor.call("tasks.remove", task._id);
 interface Props {
   task: TaskInterface;
 }

@@ -1,7 +1,8 @@
 import { Meteor } from "meteor/meteor";
 import { Accounts } from "meteor/accounts-base";
-import { TasksCollection } from "/imports/api/TasksCollection";
+import { TasksCollection } from "../imports/db/TasksCollection";
 import { LinksCollection } from "/imports/api/links";
+import '/imports/api/tasksMethods';
 
 function insertLink(title: string, url: string) {
   LinksCollection.insert({ title, url, createdAt: new Date() });

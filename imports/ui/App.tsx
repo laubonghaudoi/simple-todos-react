@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { LoginForm } from "./LoginForm";
 import { Task } from "./Task";
 import { TaskForm } from "./TaskForm";
-import { TaskInterface, TasksCollection } from "/imports/api/TasksCollection";
+import { TaskInterface, TasksCollection } from "../db/TasksCollection";
 
 export const App = () => {
   const user = useTracker(() => Meteor.user());
@@ -14,6 +14,7 @@ export const App = () => {
   const hideCompletedFilter = { isChecked: { $ne: true } };
   const userFilter = user ? { userId: user._id } : {};
   const pendingOnlyFilter = { ...hideCompletedFilter, ...userFilter };
+
   const pendingTasksCount = useTracker(() => {
     if (!user) {
       return 0;
