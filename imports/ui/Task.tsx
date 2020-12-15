@@ -8,6 +8,7 @@ const toggleChecked = (task: TaskInterface) => {
 
 const deleteTask = (task: TaskInterface) =>
   Meteor.call("tasks.remove", task._id);
+  
 interface Props {
   task: TaskInterface;
 }
