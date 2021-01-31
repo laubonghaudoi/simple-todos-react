@@ -9,3 +9,5 @@ export interface TaskInterface {
 }
 
 export const TasksCollection = new Mongo.Collection<TaskInterface>("tasks");
+
+export const TasksWithProfileCollection = new Mongo.Collection("tasksWithProfile");

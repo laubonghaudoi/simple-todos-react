@@ -1,7 +1,11 @@
 import { Meteor } from "meteor/meteor";
 import { useTracker } from "meteor/react-meteor-data";
 import React, { useState } from "react";
-import { TaskInterface, TasksCollection } from "../db/TasksCollection";
+import {
+  TaskInterface,
+  TasksCollection,
+  TasksWithProfileCollection,
+} from "../db/TasksCollection";
 import { LoginForm } from "./LoginForm";
 import { Task } from "./Task";
 import { TaskForm } from "./TaskForm";
@@ -9,6 +13,24 @@ import { TaskForm } from "./TaskForm";
 export const App = () => {
   const user = useTracker(() => Meteor.user());
 
+  // Codes for joining collections
+  useTracker(() => {
+    const handler = Meteor.subscribe("tasksWithProfile");
+    if (!handler.ready()) {
+      return {
+        tasks: [],
+        pendingTasksCount: 0,
+        isLoading: true,
+      };
+    }
+    const tasksWithProfiles = TasksWithProfileCollection.find({}).fetch();
+    // This always returns an empty array, how to fix?
+    console.log("Tasks with profiles:");
+    console.log(tasksWithProfiles);
+    return tasksWithProfiles;
+  });
+
+  // Below are codes for showing ordinary tasks
   const [hideCompleted, setHideCompleted] = useState<boolean>(false);
 
   const hideCompletedFilter = { isChecked: { $ne: true } };
@@ -39,6 +61,9 @@ export const App = () => {
         sort: { createdAt: -1 },
       }
     ).fetch();
+    // Tasks are normal, array is non-empty
+    console.log("Tasks without profiles:");
+    console.log(tasks);
     const pendingTasksCount = TasksCollection.find(pendingOnlyFilter).count();
 
     return { tasks, pendingTasksCount, isLoading: false };
