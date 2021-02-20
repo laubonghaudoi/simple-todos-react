@@ -1,8 +1,10 @@
 import { Meteor } from "meteor/meteor";
 import { Accounts } from "meteor/accounts-base";
 import { TasksCollection } from "../imports/db/TasksCollection";
+import { NotesCollection } from "../imports/db/NotesCollection";
 import "/imports/api/tasksMethods";
 import "/imports/api/tasksPublications";
+import "/imports/api/notesPublications";
 
 const insertTask = (taskText: string, user: Meteor.User | undefined | null) =>
   TasksCollection.insert({
@@ -10,6 +12,12 @@ const insertTask = (taskText: string, user: Meteor.User | undefined | null) =>
     userId: user?._id || "",
     createdAt: new Date(),
     isChecked: true,
+  });
+
+const insertNote = (noteTitle: string, user: Meteor.User | undefined | null) =>
+  NotesCollection.insert({
+    title: noteTitle,
+    userId: user?._id || "",
   });
 
 Meteor.startup(() => {
@@ -33,13 +41,17 @@ Meteor.startup(() => {
   }
   // Create a sample task if empty
   const user1 = Accounts.findUserByUsername("user1");
-  if (TasksCollection.find().count() === 0) {
+  // if (TasksCollection.find().count() === 0) {
     insertTask("Task 1 of User 1", user1);
     insertTask("Task 2 of User 1", user1);
-  }
+    insertNote("Note 1 of User 1", user1);
+    insertNote("Note 2 of User 1", user1);
+  // }
   const user2 = Accounts.findUserByUsername("user2");
   if (TasksCollection.find().count() === 0) {
     insertTask("Task 1 of User 2", user2);
     insertTask("Task 2 of User 2", user2);
-  }
+    insertNote("Note 1 of User 2", user2);
+    insertNote("Note 2 of User 2", user2);
+  // }
 });

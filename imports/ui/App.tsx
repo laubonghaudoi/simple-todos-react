@@ -6,12 +6,21 @@ import {
   TasksCollection,
   TasksWithProfileCollection,
 } from "../db/TasksCollection";
+import { NotesCollection } from "/imports/db/NotesCollection";
 import { LoginForm } from "./LoginForm";
 import { Task } from "./Task";
 import { TaskForm } from "./TaskForm";
 
 export const App = () => {
   const user = useTracker(() => Meteor.user());
+
+  useTracker(() => {
+    const handler = Meteor.subscribe("notes");
+    if (!handler.ready()) return;
+    const notes = NotesCollection.find({}).fetch();
+    console.log("Notes:")
+    console.log(notes);
+  });
 
   // Codes for joining collections
   useTracker(() => {
